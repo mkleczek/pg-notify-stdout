@@ -1,5 +1,6 @@
 # pg-notify-stdout
 Simplest possible tool to listen on PostgreSQL channel and output notifications to standard output. Use in shell scripts etc.
+Latest binary builds downloadable from https://github.com/mkleczek/pg-notify-stdout/releases/tag/0.3.0
 
 Usage:
 ```
