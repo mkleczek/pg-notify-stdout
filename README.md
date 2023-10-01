@@ -27,6 +27,6 @@ PGTARGETSESSIONATTRS="primary" postgrest&
 pid1=$!
 PGTARGETSESSIONATTRS="prefer-standby" postgrest&
 pid2=$!
-PGTARGETSESSIONATTRS="primary" pg-notify-stdout pgrst | $( while read -r msg; do if [ "$msg" = "reload schema" ]; then kill -USR2 $pid1 $pid2; fi; done; )
+PGTARGETSESSIONATTRS="primary" pg-notify-stdout pgrst | ( while read -r msg; do if [ "$msg" = "reload schema" ]; then kill -USR2 $pid1 $pid2; fi; done; )
 ```
 Thanks to fantastic https://github.com/jackc/pgx pg-notify-stdout will reconnect to master even after switchover (PostgREST will do the same as it uses libpq underneath).
