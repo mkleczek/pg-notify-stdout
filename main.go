@@ -22,22 +22,26 @@ func main() {
 		}
 	}()
 	for {
+		log.Println("Connecting to PostgreSQL")
 		conn, err = pgx.Connect(context.Background(), "")
 
 		if err != nil {
-			time.Sleep(retryAfter)
-			retryAfter = retryAfter + retryAfter
 			if retryAfter > retryMax {
 				log.Panic(err)
 			}
+			log.Println(err)
+			time.Sleep(retryAfter)
+			retryAfter = retryAfter + retryAfter
 			continue
 		}
+		log.Println("Connected")
 		retryAfter = retryMin
 
 		_, err = conn.Exec(context.Background(), "LISTEN "+os.Args[1])
 		if err != nil {
 			log.Panic(err)
 		}
+		log.Println("Waiting for notifications")
 		for {
 			notification, err := conn.WaitForNotification(context.Background())
 			if err != nil {
