@@ -10,10 +10,11 @@ Configuration via environment variables: https://www.postgresql.org/docs/current
 
 The tool is useful in master/replica scenarios as LISTEN/NOTIFY does not work for clients connected to replicas. Example:
 
-Let's say we want to have sepearate instances of [PostgREST|https://postgrest.org]:
+Let's say we want to have sepearate instances of https://postgrest.org:
 * one connected to master and serving both reads and updates
 * another connected to one of the replicas and serving read requests only
-Wa also want to be able to reconfigure both instances upon schema changes with `NOTIFY pgrst, 'reload schema'`. Unfortunatelly it will not work for the one connected to a replica. It would be best if PostgREST could use separate connection configuratin for its notification listener but it cannot at this moment.
+
+We also want to be able to reconfigure both instances upon schema changes with `NOTIFY pgrst, 'reload schema'`. Unfortunatelly it will not work for the one connected to a replica. It would be best if PostgREST could use separate connection configuratin for its notification listener but it cannot at this moment.
 
 The solution is to have a daemon connected to master and listening on pgrst channel, sending USR2 signals to PostgREST instances upon each notification. But there is no such software though - the closest I could find is https://github.com/CrunchyData/pg_eventserv - but it looks to me WebSockets are really too much and would require `wscat` or similar to use.
 
