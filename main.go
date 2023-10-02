@@ -11,6 +11,10 @@ import (
 )
 
 func main() {
+	// Make sure only messages are printed.
+	// Timestamps and other metadata
+	// can be added by log processing tool outside.
+	log.SetFlags(0)
 	const retryMin = 1 * time.Second
 	const retryMax = 1 * time.Hour
 	retryAfter := retryMin
