@@ -25,6 +25,8 @@ func main() {
 			conn.Close(context.Background())
 		}
 	}()
+
+	brokenConnectionOutput := os.NewFile(3, "")
 	for {
 		log.Println("Connecting to PostgreSQL")
 		conn, err = pgx.Connect(context.Background(), "")
@@ -52,6 +54,7 @@ func main() {
 				conn.Close(context.Background())
 				conn = nil
 				log.Println(err)
+				brokenConnectionOutput.WriteString("\n")
 				break
 			}
 
