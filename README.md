@@ -31,3 +31,9 @@ pid2=$!
 PGTARGETSESSIONATTRS="primary" pg-notify-stdout pgrst | ( while read -r msg; do if [ "$msg" = "reload schema" ]; then kill -USR2 $pid1 $pid2; fi; done; )
 ```
 Thanks to fantastic https://github.com/jackc/pgx pg-notify-stdout will reconnect to master even after switchover (PostgREST will do the same as it uses libpq underneath).
+
+The fact that the program is hanging on a database connection and waiting for NOTIFY gives an opportunity to privide additional bonus feature; daatabase server availability monitoring. It can be used to trigger other programs reconnection upon master-replica switchover:
+```
+GTARGETSESSIONATTRS="primary" pg-notify-stdout pgrst 3> >( while read -r; do kill -USR2 $pid1 $pid2; done )
+```
+pg-notify-stdout outputs empty lines to fd3 (stdout and stderr are already taken by NOTIFY messages and logging) upon each session disconnect event.
