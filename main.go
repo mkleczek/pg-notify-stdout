@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -18,6 +19,7 @@ func main() {
 	const retryMin = 1 * time.Second
 	const retryMax = 1 * time.Hour
 	retryAfter := retryMin
+	retryCount := 1
 	var conn *pgx.Conn
 	var err error
 	defer func() {
@@ -28,20 +30,26 @@ func main() {
 
 	brokenConnectionOutput := os.NewFile(3, "")
 	for {
-		log.Println("Connecting to PostgreSQL")
+		log.Printf("Trying to connect to database. Attempt %v\n", retryCount)
 		conn, err = pgx.Connect(context.Background(), "")
 
 		if err != nil {
-			if retryAfter > retryMax {
-				log.Panic(err)
-			}
 			log.Println(err)
+			log.Printf("Next database connection attempt in %v\n", retryAfter)
 			time.Sleep(retryAfter)
-			retryAfter = retryAfter + retryAfter
+			// Exponential backoff with equal jitter
+			retryAfter = (1 << retryCount) * retryMin
+			if retryAfter > retryMax {
+				retryAfter = retryMax
+			}
+			retryMilis := retryAfter.Milliseconds() / 2
+			retryMilis = retryMilis + (rand.Int63n(1000) * retryMilis / 1000)
+			retryAfter = time.Duration(retryMilis) * time.Millisecond
 			continue
 		}
-		log.Println("Connected")
+		log.Println("Connected to database")
 		retryAfter = retryMin
+		retryCount = 1
 
 		_, err = conn.Exec(context.Background(), "LISTEN "+os.Args[1])
 		if err != nil {
