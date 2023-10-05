@@ -19,7 +19,7 @@ func main() {
 	const retryMin = 1 * time.Second
 	const retryMax = 1 * time.Hour
 	retryAfter := retryMin
-	retryCount := 1
+	retryCount := 0
 	var conn *pgx.Conn
 	var err error
 	defer func() {
@@ -49,7 +49,7 @@ func main() {
 		}
 		log.Println("Connected to database")
 		retryAfter = retryMin
-		retryCount = 1
+		retryCount = 0
 
 		_, err = conn.Exec(context.Background(), "LISTEN "+os.Args[1])
 		if err != nil {
