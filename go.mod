@@ -2,7 +2,7 @@ module github.com/mkleczek/pg-notify-stdout
 
 go 1.23.0
 
-require github.com/jackc/pgx/v5 v5.7.5
+require github.com/jackc/pgx/v5 v5.7.6
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
